@@ -5,10 +5,13 @@ import model.Lesson;
 import model.Role;
 import model.Student;
 import model.User;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Workbook;
 import storage.LessonStorage;
 import storage.StudentStorage;
 import storage.UserStorage;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 
@@ -19,7 +22,8 @@ public class StudentDemo implements Command {
     private static UserStorage userStorage = new UserStorage();
     private static User currentUser = null;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, InvalidFormatException {
+
         Lesson java = new Lesson("java", "teacher name1", 34, 74);
         lessonStorage.add(java);
         Lesson javaScript = new Lesson("java script", "teacher name1", 34, 74);
@@ -60,7 +64,7 @@ public class StudentDemo implements Command {
         }
     }
 
-    private static void login() {
+    private static void login() throws IOException, InvalidFormatException {
         System.out.println("please input , email,password ");
         String emailPasswordStr = scanner.nextLine();
         String[] emailPassword = emailPasswordStr.split(",");
@@ -109,7 +113,7 @@ public class StudentDemo implements Command {
         }
     }
 
-    private static void userLogin() {
+    private static void userLogin() throws IOException, InvalidFormatException {
         System.out.println("Welcome ," + currentUser.getName());
         boolean run = true;
         while (run) {
@@ -142,6 +146,9 @@ public class StudentDemo implements Command {
                 case PRINT_ALL_LESSON:
                     lessonStorage.print();
                     break;
+                case DOWNLOAD_STUDENTS_EXCEL:
+                    downloadStudentsExcel();
+                    break;
                 default:
                     System.out.println("Invalid command, please try again");
 
@@ -149,7 +156,7 @@ public class StudentDemo implements Command {
         }
     }
 
-    public static void loginAdmin() {
+    public static void loginAdmin() throws IOException, InvalidFormatException {
         boolean run = true;
         while (run) {
             Command.printCommands();
@@ -191,11 +198,24 @@ public class StudentDemo implements Command {
                 case PRINT_ALL_LESSON:
                     lessonStorage.print();
                     break;
+                case DOWNLOAD_STUDENTS_EXCEL:
+                    downloadStudentsExcel();
+                    break;
                 default:
                     System.out.println("Invalid command, please try again");
 
 
             }
+        }
+    }
+
+    private static void downloadStudentsExcel() {
+        System.out.println("please input file location");
+        String filDir = scanner.nextLine();
+        try {
+            studentStorage.writeStudentsToExcel(filDir);
+        } catch (IOException | InvalidFormatException e) {
+            e.printStackTrace();
         }
     }
 
